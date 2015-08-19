@@ -21,7 +21,7 @@ run_analysis <- function(){
     # read in given names for the 561 variables
     features <- read.table("./dataset/features.txt")
     var_names <- as.character(features[,2])
-
+    
     # read in subjects (people)
     test_subject <- read.table("./dataset/test/subject_test.txt")
     train_subject <- read.table("./dataset/train/subject_train.txt")
@@ -35,13 +35,6 @@ run_analysis <- function(){
     activity <- rbind(test_y, train_y)
     activity <- as.data.frame(activity)
     names(activity) <- c("activity")
-    # change activity labels to useful words based on activity_labels.txt
-    activity[activity=="1"] <- "Walking"
-    activity[activity=="2"] <- "Walking Upstairs"
-    activity[activity=="3"] <- "Walking Downstairs"
-    activity[activity=="4"] <- "Sitting"
-    activity[activity=="5"] <- "Standing"
-    activity[activity=="6"] <- "Laying" # (should be Lying)
     
     # read in the 561 variable data
     test_x <- read.table("./dataset/test/X_test.txt")
@@ -58,6 +51,7 @@ run_analysis <- function(){
     sub_var_list <- append(sub_var_list_mean, sub_var_list_std)
     # downselect from 561 to just the variables related to mean or std
     datapoints_subset <- datapoints[,sub_var_list]
+    
     # modify variable names using info from features_info.txt
     # from "t" to "time"
     names(datapoints_subset) <- gsub("tBody","timeBody", names(datapoints_subset))
@@ -82,7 +76,14 @@ run_analysis <- function(){
     
     # bind into one df
     test_df <- cbind(subject, activity, datapoints_subset)
-
+    
+    # change activity labels to useful words based on activity_labels.txt
+    test_df$activity <- gsub("1", "Walking", test_df$activity)
+    test_df$activity <- gsub("2", "Walking Upstairs", test_df$activity)
+    test_df$activity <- gsub("3", "Walking Downstairs", test_df$activity)
+    test_df$activity <- gsub("4", "Sitting", test_df$activity)
+    test_df$activity <- gsub("5", "Standing", test_df$activity)
+    test_df$activity <- gsub("6", "Laying", test_df$activity)
     
     print(names(test_df))
     print(head(test_df[,1:3]))
