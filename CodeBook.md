@@ -68,12 +68,15 @@ Note that the original data included some instances where the word "Body" was du
 ##Creating the tidy datafile
 
 ###Guide to create the tidy data file
-In order for the run_analylsis.R script to work, download the data set from [here](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip) and extract it into a subdirectory called "dataset". For example, you might choose to clone this repo into `~/r/GCDproject`. In that case, the data should be downloaded and extracted into `~/r/GCDproject/dataset`.
+1. Clone this repo onto your computer (or copy the file "run_analysis.R")
+1. Download the data set from [here](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip)
+1. Extract it into a subdirectory of your R working directory called "dataset". For example, you might choose to clone this repo into `~/r/GCDproject`. In that case, the data should be downloaded and extracted into `~/r/GCDproject/dataset`.
+1. Execute `run_analysis()`.
 
 ###Cleaning of the data
 In order of execution, the following is an overview of what the script run_analysis() does:
 
-1. Load necessary r libraries
+1. Load necessary R libraries
 1. Read in the names of each of the 561 variables in the source data. This is assigned as a character vector pulling just the values and not the row numbers.
 1. Read in the two sets of values for test subjects, bind them into one vector, convert that to a data frame and assign the name "subject" to that column
 1. Read in the two sets of values for test activities, bind them into one vector, convert that to a data frame and assign the name "activity" to that column
@@ -114,6 +117,7 @@ The variable names are modified from the source data to more-readable names in t
 ###subject   
 
 Class: Factor
+
 Levels: 1 to 30
 
 * 1      :  6  
@@ -127,6 +131,7 @@ Levels: 1 to 30
 ###activity 
 
 Class: Factor
+
 Levels: All 6 are listed below
 
 * Laying           :30  
