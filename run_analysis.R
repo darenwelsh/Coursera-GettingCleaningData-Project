@@ -17,6 +17,8 @@ run_analysis <- function(){
     # 
     
     ## setwd("~/r/Coursera/Coursera-GettingCleaningData-Project")
+    # load required libraries
+    library(plyr)
     
     # read in given names for the 561 variables
     features <- read.table("./dataset/features.txt")
@@ -44,8 +46,6 @@ run_analysis <- function(){
     names(datapoints) <- var_names
     
     # subset from 561 variables to just mean()s and std()s
-    # explain in code book why I chose just mean/std of measurements
-    # not every mean in the dataset
     sub_var_list_mean <- agrep("mean()", var_names, value=TRUE)
     sub_var_list_std <- agrep("std()", var_names, value=TRUE)
     sub_var_list <- append(sub_var_list_mean, sub_var_list_std)
@@ -73,19 +73,51 @@ run_analysis <- function(){
     names(datapoints_subset) <- gsub("std.[^-]*$","StandardDeviation", names(datapoints_subset))
     # remove "()" after "std" in strings with "std()-"
     names(datapoints_subset) <- gsub("std..*-","StandardDeviation-", names(datapoints_subset))
+    # correct duplicate "BodyBody" to "Body"
+    names(datapoints_subset) <- gsub("BodyBody","Body", names(datapoints_subset))
     
     # bind into one df
-    test_df <- cbind(subject, activity, datapoints_subset)
+    df <- cbind(subject, activity, datapoints_subset)
     
     # change activity labels to useful words based on activity_labels.txt
-    test_df$activity <- gsub("1", "Walking", test_df$activity)
-    test_df$activity <- gsub("2", "Walking Upstairs", test_df$activity)
-    test_df$activity <- gsub("3", "Walking Downstairs", test_df$activity)
-    test_df$activity <- gsub("4", "Sitting", test_df$activity)
-    test_df$activity <- gsub("5", "Standing", test_df$activity)
-    test_df$activity <- gsub("6", "Laying", test_df$activity)
+    df$activity <- gsub("1", "Walking", df$activity)
+    df$activity <- gsub("2", "WalkingUpstairs", df$activity)
+    df$activity <- gsub("3", "WalkingDownstairs", df$activity)
+    df$activity <- gsub("4", "Sitting", df$activity)
+    df$activity <- gsub("5", "Standing", df$activity)
+    df$activity <- gsub("6", "Laying", df$activity)
     
-    print(names(test_df))
-    print(head(test_df[,1:3]))
+    # copy df for use in creating averagesdf (step 5)
+    df2 <- df
+    # add new "id" column combining "subject" and "activity" for easier factoring
+    df2 <- data.frame("id"=paste("Subject", df$subject, "-", df$activity, sep=""), df[,3:68])
+    
+    # initialize "averagesdf"
+    levels <- levels(df2$id)
+    averagesdf <- NULL #numeric(length(levels(df2$id)))
+    
+    for(i in seq_along(levels)){
+        # assign level via data.frame to get actual value
+        # Ref: http://stackoverflow.com/questions/8774515/r-how-do-i-output-the-factor-level-from-a-for-loop-rather-than-the-index
+        lvl <- data.frame(level = levels[i])
+        subset <- subset.data.frame(df2, df2$id==as.character(lvl$level), select=2:67)
+        averagesdf <- rbind(averagesdf, as.vector(colMeans(subset)))
+    }
+    
+    averagesdf <- as.data.frame(averagesdf)
+    avgnames <- names(df2[2:67])
+    names(averagesdf) <- avgnames
+    # prepend "Average-" to each variable name
+    names(averagesdf) <- gsub("^(.*)", "Average-\\1", names(averagesdf))
+    # name rows of new df with subject-activity pair
+    row.names(averagesdf) <- levels(df2$id)
+    
+    # add cols for subject and activity back in just to be extra tidy
+    subjectvals <- gsub("[A-Za-z]*([0-9]*)-.*$", "\\1", levels)
+    activityvals <- gsub("[A-Za-z]*[0-9]*-(.*)$", "\\1", levels)
+    averagesdf <- data.frame("subject"=subjectvals, "activity"=activityvals, averagesdf)
+    
+    #print(averagesdf[1:10,1:5])
+    write.table(averagesdf, file="averages.txt", row.names=FALSE)
     
 }

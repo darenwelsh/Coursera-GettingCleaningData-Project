@@ -13,5 +13,3 @@ In order for the run_analylsis.R script to work, download the data set from [her
 
 ### Background Information
 For information about the variables, the data structure, and how the source data was manipulated for this project, see [the Code Book](CodeBook.md)
-
-For more information about the source data, see the [Human Activity Recognition Using Smartphones Data Set page (UCI)](http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones).
